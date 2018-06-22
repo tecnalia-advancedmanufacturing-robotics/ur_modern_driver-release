@@ -1,0 +1,12 @@
+Source: ros-kinetic-ur-modern-driver
+Section: misc
+Priority: extra
+Maintainer: Thomas Timm Andersen <thomas.timm.dk@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), ros-kinetic-actionlib, ros-kinetic-catkin, ros-kinetic-control-msgs, ros-kinetic-controller-manager, ros-kinetic-geometry-msgs, ros-kinetic-hardware-interface, ros-kinetic-industrial-msgs, ros-kinetic-roscpp, ros-kinetic-rosunit, ros-kinetic-sensor-msgs, ros-kinetic-std-srvs, ros-kinetic-tf, ros-kinetic-trajectory-msgs, ros-kinetic-ur-msgs
+Homepage: http://wiki.ros.org/ur_modern_driver
+Standards-Version: 3.9.2
+
+Package: ros-kinetic-ur-modern-driver
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-kinetic-actionlib, ros-kinetic-control-msgs, ros-kinetic-controller-manager, ros-kinetic-force-torque-sensor-controller, ros-kinetic-geometry-msgs, ros-kinetic-hardware-interface, ros-kinetic-industrial-msgs, ros-kinetic-joint-state-controller, ros-kinetic-joint-trajectory-controller, ros-kinetic-robot-state-publisher, ros-kinetic-roscpp, ros-kinetic-sensor-msgs, ros-kinetic-std-srvs, ros-kinetic-tf, ros-kinetic-trajectory-msgs, ros-kinetic-ur-description, ros-kinetic-ur-msgs
+Description: The new driver for the UR3/UR5/UR10 robot arms from universal robots

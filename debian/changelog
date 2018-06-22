@@ -1,0 +1,400 @@
+ros-kinetic-ur-modern-driver (0.0.2-0xenial) xenial; urgency=high
+
+  * Initialize VelocityInterface::prev_velocity_cmd_ with zeroes
+  * Add robot_state_publisher as a dependency (#20 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/20>)
+    Adds robot_state_publisher to package.xml. The package is used in launch files and should be defined as a dependency.
+  * Broken build fix, oops!
+  * Fixed compatability issue
+    Pre-refactor version of URScript topic used to automatically append newline when not the last character of the message however that was not the case for the new version.
+  * Replace ros_controllers metapackage dependency for controller packages
+  * Add time parameter to speedj for UR software >= 3.3
+    Fixes #15 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/15>.
+    Related to https://github.com/ThomasTimm/ur_modern_driver/issues/92
+  * Create issue_template.md
+  * respawn needs to have a value (#12 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/12>)
+    Respawn defaults to false, so just remove it.
+  * Add support for version 3.5
+    A new undocumented uchar was added to RobotMode
+  * Re-add urscript topic (#7 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/7>)
+    * Re-added UR script - for custom UR Script execution
+    * Restarting the driver when robot closes the connection on script error.
+    The pipelines work in the way that if the connection is
+    is closed by the control PC, it will not be re-established. This
+    happens for example if you use the URScript topic and upload
+    script that does not compile. The robot will then close the
+    connection, the pipeline will close and any subsequent
+    uploads will fail and noone realises there is a problem.
+    While we could re-establish the connection, I think much better
+    solution is to shutdown the driver in such case. This is much more
+    resilient behaviour as it will clean up any inconsistent driver state.
+    We can utilise "respawn" feature of ROS launch and restart such
+    driver automatically (launch files are updated as part of that change).
+    On top of "production" stability, it allows for much nicer development
+    workflow - you can use URScript topic for development of new scripts
+    and have the driver restart every time you make mistake.
+    Without it, any mistake requires restarting the driver manually.
+  * Publish industrial_msgs::RobotStatus (#5 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/5>)
+  * Fixed default tcp_link value
+  * Improved README.md
+  * Merged README.md from upstream
+  * Enable kinetic builds for travis
+  * various improvements and fixes for use_ros_control=true (#6 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/6>)
+    * Find matching hardware_interface using the required type
+    The name of the controller was used in order to find and start
+    the matching hardware interface.
+    In consequence this meant that one could only define one controller
+    for each hardware interface.
+    Now, the controller's required type of hardware interface is used
+    to find and start the matching hardware interface.
+    * separate read & update in controller
+    consume is defined as read+update, but update
+    does not include read in ros_control terminology.
+    * Handle latency in pipeline loop
+    The controllers need to update at a rate of *at least* 125Hz,
+    but the wait_dequeue_timed call could in theory slow the loop down to 62.5Hz.
+    The old ur_modern_driver worked around this problem by sending goals
+    at 4*125Hz.
+    This patch exploits the onTimeout method of a consumer to update with
+    the specified frequency of the control loop, even if no new state message
+    arrived after the previous command.
+    * publish wrench w.r.t. tcp frame
+    The messages had an empty frame_id before and could not be displayed in RViz
+    * support ros_control in indigo
+  * Merge pull request #3 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/3> from TAMS-Group/pr-kinetic-catkin-lint
+    Satisfy catkin_lint
+  * fix typo in catkin_package
+    ur_hardware_interface is no *dependency* of this package.
+    It's a library *provided* by this package
+  * cleanup inconsistent / unused dependencies
+  * set(CMAKE_CXX_FLAGS -> add_compile_options
+    Some of the set commands overwrote user-provided values.
+    Also add_compile_options is the much cleaner interface to add the values
+  * Merge pull request #2 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/2> from TAMS-Group/fork_master
+    Activation modes for service /ur_driver/robot_enable
+  * Change default activation mode to 'Never'
+    Maintains default behavior of indigo that no controller activation is required.
+    Enabling required activation can be done by passing 'require_activation' as Always/OnStartup
+    to the ur_common.launch or by modifying corresponding launch files.
+  * Implement activation modes of robot_enable service
+    Adds parameter 'require_activation' to configure when the service should be called (Always, Never, OnStartup).
+  * Removed jade and kinetic builds from travis for now
+  * Fixed travis "fatal error: std_srvs/Empty.h: No such file or directory"
+  * travis debugging...
+  * Better travis config
+  * Started ROS CI config
+  * Merge pull request #1 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/1> from TAMS-Group/fork_master
+    Fix runtime issues
+  * Change ROS_ERROR_STREAM to LOG_ERROR.
+  * Fixed SO_REUSEADDR being set after bind rather than before
+  * Fix type warning in log output
+  * Fixing some typos.
+  * Adds multiple retries to accept reverse connection
+    We observed that the accept failed nondeterministically in rare cases.
+  * Extend error messages
+    Extends error message to print invalid joint names.
+    Adds max_velocity as parameter descriptor in error message.
+  * Adds prefix to all joint names.
+  * Adds missing param max_velocity.
+  * Fixed minor merge conflict
+  * Fixed minor ur3 launch typos issue #98 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/98>
+  * Fixed issues preventing from compiling on Kinetic
+  * Added testing for master board parsing and fixed unparsed fields
+  * Added bitset parsing and setter for random data
+  * Fixed missing include
+  * Removed more old files
+  * removed useless file
+  * Clang-format run
+  * Fixed compiler warnings
+  * Clean up of old driver files
+  * Fixed jitter issues
+  * socket improvment
+  * Parameter parsing
+  * minor improvements
+  * Fixed trajectory issue
+  * WIP
+  * Trjaectory follower improvements
+  * Main
+  * Fixed invalid inheritance on ActionServer
+  * Added set options function for sockets
+  * Action server improvements
+  * Major refactor
+  * Merge pull request #100 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/100> from tecnalia-advancedmanufacturing-robotics/fix/92
+    Add time parameter back to speedj for SW >= 3.3.
+  * Big code dump
+  * Fixed minor issues
+  * Factory and setup improvements
+  * Implemented ros control
+  * Rt publisher improvement
+  * Initial implementation of commander
+  * Ignore initial version message
+  * Improved stream implementation
+  * Improved pipeline design
+  * Changed masterboard IO data to bitset
+  * Add time parameter back to speedj for SW >= 3.3.
+  * formatting
+  * Refactored const size arrays to std::array
+  * Added tests
+  * Removed old state file
+  * Adopted roscpp code style and naming convention
+  * Fixed minor parsing issues with RTState
+  * Added equality operators for vector types
+  * Minor pipeline improvements
+  * Fixed log format error
+  * Fixed strict alisasing warnings and double/float big endian issues
+  * Fixed RTState parsing bug
+  * RTPublisher main
+  * Improved logging and formatting
+  * RTShared documentation improvement
+  * Improved URStream logging
+  * Fixed consumer thread getting stuck in dequeue on shutdown
+  * Improved RTPublisher
+  * Added clang formatting
+  * new entry point WIP
+  * Implemented RT publishing
+  * Completed parsing of UR state, messages and RT
+  * Improved bin parser debugging
+  * Better non ros output logging
+  * Refactoring, improvements and fixes
+  * BinParser improvements
+  * Newline parity between printf and ros logging
+  * Implemented network byte order decoding
+  * Implemented URStateParser, URRTStateParser and URProducer
+  * Implemented initial robot state and parsing
+  * Removed uneeded pipeline.cpp
+  * Added basic vector and cartesian types
+  * Refactored logging
+  * Improved BinParser
+  * Implemented URStream
+  * Implemented abstract pipeline design
+  * Merge pull request #79 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/79> from HurchelYoung/master
+    Minor corrections needed for default ros_control based approach
+  * Update README.md
+    typo
+  * Update README.md
+    corrected controller names to match original ur10 and ur5 usage
+  * Update ur3_controllers.yaml
+    corrected controller names to match original ur10 and ur5 usage
+  * Update ur5_controllers.yaml
+    corrected controller names to match original ur10 and ur5 usage
+  * Update ur10_controllers.yaml
+    corrected controller names to match original ur10 and ur5 usage
+  * Update ur10_controllers.yaml
+    updated controller names to be consistent between all models and readme suggested usage
+  * Update ur5_controllers.yaml
+    revised controller names to be consistent between all models and readme suggestions
+  * Update README.md
+    Revised the ros_control usage notes
+  * Update README.md
+    Added instructions on where to find packages needed when using ros_control
+  * Update README.md
+    corrected the controller names for to be used when implementing ros_control.  Also noted that the velocity_based_position_trajectory_controller is started by default.
+  * Merge pull request #74 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/74> from miguelprada/ros_control_tool0_controller
+    Expose tool pose/twist from RT when ros_control is active.
+  * Expose tool pose/twist from RT when ros_control is active.
+    Replicates #20 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/20> for the case where ros_control is active.
+  * Merge pull request #72 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/72> from NikolasE/master
+    removed some typos
+  * removed some typos
+  * Merge pull request #64 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/64> from miguelprada/no_pos_traj_controller_gains
+    Remove unused PID gain parameters from controller configuration.
+  * Added the servoj gain and servoj lookahead time as a parameter at launch time. Resolves #47 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/47>
+  * Merge branch 'master' of https://github.com/ThomasTimm/ur_modern_driver
+  * Remove unused PID gain parameters from controller configuration.
+  * Merge pull request #57 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/57> from miguelprada/fix_speedj_sw_gt_3.1
+    Fix velocity interface after changes in SW > 3.1.
+  * Fix velocity interface after changes in SW > 3.1.
+    Behaviour of t parameter in speedj command has changed and requires not to set this (optional) parameter for correct behaviour in SW > 3.1.
+  * Very minor code cleanup
+  * Chnaged tool0_controller base frame. fixes #53 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/53>
+  * Changed time base for ros_control. Fixes #44 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/44>
+  * Merge pull request #41 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/41> from smart-robotics/master
+    Fix mismatch in numbering digital pins between set_io and io_states
+  * Fix: New order in digital outputs
+    0-7: standard digital out
+    8-15: configurable digital out
+    16-17: tool digital out
+  * Merge pull request #2 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/2> from ThomasTimm/master
+    Merge updates from original driver
+  * Fixed a bug where tool0_controller position was all 0 for ur firmware version 1.8.xx
+  * Changed test_move.py to use wait_for_message instead of global vars
+  * Fixed 'No joint names published when not using a prefix'. Closes #34 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/34>
+  * Fixed 'No joint names published when not using a prefix'. Closes #34 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/34>
+  * Removed info message about setting prefix when prefix is an empty string
+  * Removed the prefix tag from the ur_description launch call
+  * Added prefix args to ros_control launch files and to the tool0_controller transform frame
+  * Updated launch files to evaluate a 'prefix' argument and pass it to the driver and urdf file. Fixes #28 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/28>
+  * Tweaked ur5 PID controller values. Fixes #27 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/27>
+  * Changed robot_state_publisher to fix #32 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/32>
+  * Added test_move.py with joint_states subscriber
+  * Merge pull request #31 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/31> from hemes/master
+    Added check to ensure robot pose matches initial trajectory point.
+  * Added check to ensure robot pose matches initial trajectory point.
+  * Added verification of RT message length for firmware versions 1.6 to 3.2
+  * Fixed set_io service to work with 3.x
+  * Merge pull request #26 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/26> from jettan/master
+    Ignore malformed messages from URSim running 1.8.X.
+  * Ignore malformed messages from UR5 running 1.8.X.
+  * Merge pull request #24 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/24> from gavanderhoorn/patch-1
+    readme: fix minor typo
+  * readme: fix minor typo
+  * Merge pull request #23 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/23> from smart-robotics/master
+    Adds mini-tutorial about tool0_controller frame
+  * Adds mini-tutorial about tool0_controller frame
+  * Merge pull request #20 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/20> from smart-robotics/master
+    Expose tool pose from RT connection in ROS
+  * Set reference frame for twist to base_frame_
+  * Catch NaN error if angles are zero
+  * Kill servo_thread in urscript. Fixes #15 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/15>
+  * Merge branch 'master' of https://github.com/ThomasTimm/ur_modern_driver
+  * Corrected bug that returned target_q instead of target_qd
+  * Added launchfiles used for imitating old python driver
+  * Publish tool twist and get base and tool frame names from parameters
+  * Publish actual tool pose as pose msg and tf
+  * Merge pull request #1 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/1> from ThomasTimm/master
+    Merge new features from original driver
+  * Revert "Add install targets" -> rollback to original
+    This reverts commit c18ff438ca4d35985cb4621f31cfbdd683cac479.
+  * Revert "Add install targets"
+    This reverts commit c18ff438ca4d35985cb4621f31cfbdd683cac479.
+  * Revert "Rollback to original (diagnostics is now in separate branch)"
+    This reverts commit 644ea2491c406ce68b651cd1d11366bfd3bf96cf.
+  * Update README.md
+    fixed bibtex citation
+  * Update README.md
+    Added Citation information
+  * Added parameter for reverse port. closes #12 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/12>
+  * Optimized servoj function call for firmware version >= 3.1
+  * Removed hardcoded velocity limit in vel_based ros_control
+  * Added launch files for making the driver behave just like the old python driver
+  * Code cleanup
+  * Added a check to see that the robot is connected before attempting to write to the socket. Fixes #11 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/11>
+  * Merge pull request #10 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/10> from jeppewalther/ur3_support
+    Ur3 support
+  * Merge remote-tracking branch 'thomas_timm/master' into ur3_support
+  * Fixed #9 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/9>. Now data streaming is much more regular
+  * Changed default servoj_time for better backwards compatibility and smoother pos_based ros_control
+  * Tuned PID values to work with a real robot
+  * Added info message about reconnection aquired
+  * code cleanup
+  * Added stability to reverse connection. Resolves #6 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/6>
+  * Changed license to Apache 2.0
+  * Fixed an issue with using a simulated robot on firmware <= 1.8
+  * Made sure to stop any executing trajectory when the driver is halted
+  * Changed servoj_time handling to minimize network transfers. Fixes #7 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/7>
+  * Included suggestion to update build-essential pkg if compiler doesn't support c++11
+  * Added install targets
+  * Add install targets
+  * Rollback to original (diagnostics is now in separate branch)
+  * Improved goal handling.
+    If the robot receives a new goal before the previous is succeeded, the previous will be aborted
+  * Added detection of E-stop and protective stop.
+  * Fixed an issue where canceling a trajectory wouldn't stop the robot.
+  * changed to use goal_handle_ instead of goal_
+  * fixed typo in error string
+  * Remove obsolete robot state publisher
+  * Publisher driver state as diagnostics
+  * Changed from simpleActionServer to Actionserver. Fixed bug that prevented starting the driver in
+    non-ros-control mode
+  * Changed minimum servoj time. Fixes #3 <https://github.com/tecnalia-advancedmanufacturing-robotics/ur_modern_driver/issues/3>
+  * Stop sending data to servoj when stopTraj is called
+  * Stop sending data to servoj when stopTraj is called
+  * Merge branch 'speed_rate_limit'
+  * Improved ros_control performance and stability
+  * Publish robot_state
+  * Added a check to incoming goals to see if there are any points in the trajectory
+  * UR3 Support
+  * Changed the servoj loop time for better stability
+  * Update README.md
+    Ficed a few typos
+  * Fixed a few typos in Readme.md
+  * Updated the readme with instructions for using ros_control
+  * Updated launch files
+  * Updated ur10_ros_control.launch to load all controllers
+  * Fixed order of starting and stopping controllers
+  * Made sure all controllers are loaded
+  * Included a position-based controller. Also prettied up printing
+  * Specified type of position_trajectory_controller
+  * Split servoj into several functions for reuseability
+  * Removed old description carried over from boilerplate
+  * Added parameter to use eiter ros_control or old-style interface
+  * Added catch in case communication fails
+  * Merge branch 'ros-control'
+  * Merge branch 'master' into ros-control
+    Conflicts:
+    src/ur_communication.cpp
+  * Added reconnect to secondary port
+  * Added reconnect to RT port
+  * Added reconnect feature on RT port
+  * Clean up
+  * Re-included io_states publisher
+  * Added control switching
+  * Implemented ros-control
+  * Verified all functionality on all simulators
+  * Deleted some commented code
+  * Deleted some commented code
+  * Removed wait in accept_goal
+  * Changed how trajectories are handled to try and speed things up
+  * Changed how trajectories are handled to try and speed things up
+  * Checking for acceleration in actionGoal input. Adjusted sweet spot for max_time_step
+  * Removed commented code and non-RT socket write
+  * Taking IP address from parameter server as default instead of command line as per ROS-Industrial specs
+  * Limited the published IO state to 10 for pre 3.0
+  * Added sanity check to setSpeed input
+  * Updated Readme
+  * Fixed printing of version string
+  * Updated list of tested robots
+  * Sending commands to the robot is now async of reading
+  * Fixed version bound check in RT message parsing
+  * Updated list of tested devices to include 3.0
+  * Fixed bug for RT message garbage in 3.0
+  * Fixed a bug related to malformed RT messages in 3.0.
+    updated readme
+  * Fixed a bug related to malformed RT messages in 3.0.
+    updated readme
+  * Added som ROS_DEBUG messages for IO states
+  * Bugfixes in URScript commands
+  * Updated readme
+  * Updated readme
+  * ROSify output based on compiler flag
+  * Tested and bugfixed masterboard data parsing
+  * Added ROS publisher of IOStates
+  * Parsing masterboard data
+  * Added URScript interface - untested
+  * Set speed on all joints to 0 before closing RT socket. Set short timeout on non-RT socket
+  * Close RT socket
+  * added *~ to .gitignore
+  * Implemented communication on port 30001 and 30002 - untested
+  * Implemented communication on port 30001 and 30002 - untested
+  * Implemented communication on port 30001 and 30002 - untested
+  * Verified that the use of a char buffer + string concatenation is actually faster than a stringstram
+  * Started structure for non real time data parsing
+  * Prepared msg publisher for joint_offset
+  * Fixed calls to ROS_ERROR
+  * Sanity check of actionserver goal input
+  * Added boundary check for setting payload
+  * Read payload and max velocity from parameter server
+  * Added minPayload, maxPayload and maxVelocity
+  * Chnaged magic constant to io_flag_delay_
+  * Fixed include
+  * Fixed include
+  * Added ROS hooks for services
+  * Added IO and payload service
+  * added launch files
+  * added launch files
+  * Add speed interface
+  * Classify the ros wrapper
+  * Classify the ros wrapper
+  * Added sleep before reporting action goal is succesfull
+  * Bugfix in calculating servoj commands
+  * Added trajectory and actionlib interface
+  * Changed uint to unsigned int for better cross-platform performance
+  * Removed potential deadlock
+  * Cleaned up a bit and removed a few global vars
+  * Update LICENSE
+  * Initial commit
+  * Adding files
+  * Contributors: G.A. vd. Hoorn, Henning, Henning Kayser, HurchelYoung, Jarek Potiuk, Jeppe Walther, Jethro Tan, Jørgen Borgesen, Michael Görner, Miguel Prada, Nikolas Engelhard, Robot Printer, Simon, Simon Jansen, Simon Rasmussen, Simon Schmeisser, Simon Schmeisser (isys vision), Thomas Timm Andersen, hemes, sepjansen, v4hn
+
+ -- Thomas Timm Andersen <thomas.timm.dk@gmail.com>  Thu, 21 Jun 2018 22:00:00 -0000
+
+
